@@ -1,0 +1,6 @@
+---
+s3_api:
+  access_key:
+  secret_key:
+  bucket: rpm-manageiq-org
+  endpoint: https://nyc3.digitaloceanspaces.com
