@@ -1,0 +1,11 @@
+jobs:
+  include:
+  - stage: srpm
+    script: bin/srpm.rb
+  - stage: arch
+    script: bin/arch.rb
+  - stage: finalize
+    script: bin/finalize.rb
+before_install:
+- openssl aes-256-cbc -K $encrypted_ea2bdde4ae67_key -iv $encrypted_ea2bdde4ae67_iv
+  -in config/settings.local.yml.enc -out config/settings.local.yml -d
