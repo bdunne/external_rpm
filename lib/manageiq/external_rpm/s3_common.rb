@@ -30,21 +30,23 @@ module ManageIQ
           return false
         end
 
+        delete_at = (Time.now.utc.to_i + 604800).to_s # One week from now
+
         puts "Uploading: #{destination}"
         File.open(source, 'rb') do |content|
           client.put_object(
             :bucket => Settings.s3_api.bucket,
             :key    => destination,
             :body   => content,
-            :acl    => 'public-read'
+            :acl    => 'public-read',
+            :metadata => {"delete_at" => delete_at}
           )
         end
         return true
       end
 
       def download_directory(source, destination_dir)
-        client.list_objects(:bucket => ManageIQ::ExternalRpm::Settings.s3_api.bucket, :prefix => source).flat_map(&:contents).each do |object|
-          next if object.key.end_with?("/") # The directory itself is in the list
+        list_objects(source) do |object|
           basename = File.basename(object.key)
           local_path = destination_dir.join(basename)
           if local_path.file?
@@ -53,6 +55,15 @@ module ManageIQ
             puts "Fetching source file: #{basename}"
             client.get_object(:bucket => ManageIQ::ExternalRpm::Settings.s3_api.bucket, :key => object.key, :response_target => local_path)
           end
+        end
+      end
+
+      def list_objects(prefix, &block)
+        return enum_for(__method__, prefix) unless block_given?
+
+        client.list_objects(:bucket => ManageIQ::ExternalRpm::Settings.s3_api.bucket, :prefix => prefix).flat_map(&:contents).each do |object|
+          next if object.key.end_with?("/") # The directory itself is in the list
+          yield object
         end
       end
     end
