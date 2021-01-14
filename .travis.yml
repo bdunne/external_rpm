@@ -9,7 +9,7 @@ jobs:
     script: bin/arch.rb
     arch: ppc64le
   - stage: arch-s390x
-    script: bin/arch.rb
+    script: travis_wait bin/arch.rb
     arch: s390x
   - stage: finalize
     script: bin/finalize.rb
