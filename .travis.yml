@@ -6,7 +6,7 @@ jobs:
     script: bin/arch.rb
     arch: amd64
   - stage: arch-ppc64le
-    script: bin/arch.rb
+    script: travis_wait bin/arch.rb
     arch: ppc64le
   # - stage: arch-s390x
   #   script: travis_wait bin/arch.rb
